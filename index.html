@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureFlow - תקשורת אפקטיבית בצוות</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Heebo', sans-serif; background-color: #f8fafc; color: #1e293b; overflow-x: hidden; }
+        
+        /* Smooth Scrolling */
+        html { scroll-behavior: smooth; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Animations */
+        .fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* Glassmorphism & Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1); border-color: #38bdf8; }
+
+        /* Chat Styles */
+        .chat-container { background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
+        .chat-bubble { max-width: 85%; padding: 14px 18px; border-radius: 18px; margin-bottom: 12px; position: relative; font-size: 0.95rem; line-height: 1.5; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .chat-user { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; align-self: flex-start; border-bottom-right-radius: 4px; }
+        .chat-manager { background-color: #ffffff; color: #334155; align-self: flex-end; border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; }
+        
+        /* Typing Dots */
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* Chart Fixes */
+        .chart-wrapper { height: 400px; width: 100%; position: relative; }
+    </style>
+</head>
+<body class="bg-slate-50 selection:bg-sky-200 selection:text-sky-900">
+
+    <!-- Navbar -->
+    <nav class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <!-- LOGO INSERTION -->
+                <img src="https://futureflow.co.il/images//FutureFlow%20Logo.png" alt="FutureFlow Logo" class="h-8 md:h-10 w-auto object-contain">
+            </div>
+            <div class="hidden md:flex space-x-8 space-x-reverse text-sm font-medium text-slate-600">
+                <a href="#problem" class="hover:text-sky-600 transition duration-300">האתגר</a>
+                <a href="#method" class="hover:text-sky-600 transition duration-300">השיטה</a>
+                <a href="#science" class="hover:text-sky-600 transition duration-300">המדע מאחורי זה</a>
+                <a href="#tool" class="px-6 py-2.5 bg-sky-600 text-white rounded-full hover:bg-sky-700 transition shadow-lg hover:shadow-sky-200 transform hover:-translate-y-0.5 font-bold">הכלי לניסוח</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative overflow-hidden pt-20 pb-16 text-center px-4">
+        <!-- Background decorative blobs -->
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-sky-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+        <div class="absolute top-0 right-1/4 w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+
+        <div class="relative z-10 max-w-4xl mx-auto fade-in-up">
+            <span class="inline-block py-1.5 px-4 rounded-full bg-sky-50 border border-sky-100 text-sky-700 text-xs font-bold tracking-wider mb-6 uppercase shadow-sm">לפיתוח מצוינות אישית</span>
+            <h1 class="text-5xl md:text-7xl font-black text-slate-800 mb-6 leading-tight tracking-tight">
+                להפוך מ"תקוע/ה"<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-indigo-600">למאסטר בפתרון בעיות</span>
+            </h1>
+            <p class="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-10 font-light">
+                ההבדל בין מתכנת ג'וניור לסיניור הוא לא רק בקוד, אלא בדרך שבה הם מבקשים עזרה.
+                המדריך הזה יעזור לך לקצר תהליכים, ללמוד מהר יותר, ולהפסיק לחכות לתשובות.
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="#problem" class="text-sky-600 font-bold hover:underline underline-offset-4 decoration-2 decoration-sky-300 flex items-center gap-2">
+                    <span>בואו נתחיל</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- SECTION 1: The Problem (Ping Pong) -->
+    <section id="problem" class="max-w-6xl mx-auto py-20 px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            
+            <div class="fade-in-up delay-100">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-2xl text-red-500 shadow-sm border border-red-100">🛑</div>
+                    <h2 class="text-3xl font-bold text-slate-800">למה "זה לא עובד" <br>היא לא באמת שאלה?</h2>
+                </div>
+                <p class="text-lg text-slate-600 mb-6 leading-relaxed">
+                    כשאנחנו שולחים הודעה עמומה, אנחנו לא מעבירים את הבעיה – אנחנו רק פותחים "משחק פינג-פונג" מתיש של שאלות הבהרה.
+                </p>
+                
+                <div class="space-y-4 mt-8">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex gap-4 hover:border-red-200 transition">
+                        <div class="w-1 h-full bg-red-400 rounded-full"></div>
+                        <div>
+                            <h4 class="font-bold text-slate-800">צוואר בקבוק</h4>
+                            <p class="text-sm text-slate-500 mt-1">את/ה נתקע/ת בהמתנה לתשובה, והמנהל נתקע בניסיון להבין מה קרה.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex gap-4 hover:border-red-200 transition">
+                        <div class="w-1 h-full bg-red-400 rounded-full"></div>
+                        <div>
+                            <h4 class="font-bold text-slate-800">פספוס הלמידה</h4>
+                            <p class="text-sm text-slate-500 mt-1">אם "יתקנו לך", לא תלמד/י. בפעם הבאה הבעיה תחזור.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulator -->
+            <div class="glass-card rounded-3xl overflow-hidden flex flex-col h-[550px] shadow-2xl fade-in-up delay-200 ring-1 ring-slate-900/5">
+                <div class="bg-white/80 px-6 py-4 border-b border-slate-100 flex justify-between items-center backdrop-blur-md sticky top-0 z-10">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Live Simulation</span>
+                    <div class="flex bg-slate-100 rounded-lg p-1">
+                        <button onclick="playScenario('bad')" class="text-xs px-4 py-1.5 rounded-md transition font-medium focus:outline-none" id="btn-bad">הדרך הרגילה</button>
+                        <button onclick="playScenario('good')" class="text-xs px-4 py-1.5 rounded-md transition font-medium focus:outline-none text-slate-500 hover:text-slate-700" id="btn-good">FutureFlow Way</button>
+                    </div>
+                </div>
+                
+                <div id="chat-container" class="flex-1 p-6 chat-container overflow-y-auto flex flex-col gap-3 scroll-smooth">
+                    <!-- Content via JS -->
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400 gap-3 opacity-60">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        <p class="text-sm">בחר סימולציה כדי להתחיל</p>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-white border-t border-slate-100 text-center relative z-20">
+                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">זמן פתרון משוער</p>
+                    <span id="time-estimate" class="font-black text-2xl text-slate-200">-</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: The Methodology -->
+    <section id="method" class="py-24 bg-slate-900 text-white relative overflow-hidden">
+        <!-- Abstract Shapes -->
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-sky-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-sky-400 font-bold tracking-widest text-sm uppercase">המתודולוגיה</span>
+                <h3 class="text-4xl md:text-5xl font-black mt-3 mb-6">4 עמודי התווך לשאלה מושלמת</h3>
+                <p class="text-slate-300 max-w-2xl mx-auto text-lg">
+                    לפני ששולחים הודעה, וודאו שהיא עונה על ארבעת הסעיפים הבאים. זה מבטיח שהצד השני יקבל את כל התמונה מיד.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-3xl hover:bg-slate-800 transition duration-300 group">
+                    <span class="text-6xl font-black text-slate-700 group-hover:text-sky-500/20 transition-colors absolute top-4 left-6">1</span>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-sky-500/20 rounded-xl flex items-center justify-center text-sky-400 text-2xl mb-6">🔭</div>
+                        <h4 class="text-xl font-bold mb-3">Context<br><span class="text-sm text-slate-400 font-normal">מה עשיתי?</span></h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            תיאור הפעולות שבוצעו עד לתקלה. 
+                            <br><em class="text-sky-300/60 block mt-2">"נכנסתי למסך X, לחצתי על Y..."</em>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-3xl hover:bg-slate-800 transition duration-300 group">
+                    <span class="text-6xl font-black text-slate-700 group-hover:text-indigo-500/20 transition-colors absolute top-4 left-6">2</span>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400 text-2xl mb-6">🎯</div>
+                        <h4 class="text-xl font-bold mb-3">Expectation<br><span class="text-sm text-slate-400 font-normal">מה ציפיתי?</span></h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            חשוב להבין אם הפער הוא בהבנת המוצר או בקוד.
+                            <br><em class="text-indigo-300/60 block mt-2">"ציפיתי לראות הודעת אישור..."</em>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-3xl hover:bg-slate-800 transition duration-300 group">
+                    <span class="text-6xl font-black text-slate-700 group-hover:text-pink-500/20 transition-colors absolute top-4 left-6">3</span>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center text-pink-400 text-2xl mb-6">🔥</div>
+                        <h4 class="text-xl font-bold mb-3">Reality<br><span class="text-sm text-slate-400 font-normal">מה קרה בפועל?</span></h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            עובדות יבשות. לוגים, שגיאות, צילומי מסך.
+                            <br><em class="text-pink-300/60 block mt-2">"קיבלתי שגיאת 500 ב-Network..."</em>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-slate-800/50 backdrop-blur border border-slate-700 p-8 rounded-3xl hover:bg-slate-800 transition duration-300 group border-t-4 border-t-emerald-500">
+                    <span class="text-6xl font-black text-slate-700 group-hover:text-emerald-500/20 transition-colors absolute top-4 left-6">4</span>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 text-2xl mb-6">💡</div>
+                        <h4 class="text-xl font-bold mb-3">Hypothesis<br><span class="text-sm text-slate-400 font-normal">ההשערה שלי</span></h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            החלק הכי חשוב לצמיחה שלך. מה *לדעתך* הבעיה?
+                            <br><em class="text-emerald-300/60 block mt-2">"אולי חסר פרמטר בבקשה?"</em>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: The Science (References) -->
+    <section id="science" class="max-w-6xl mx-auto py-24 px-6">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+            <!-- Text Content -->
+            <div class="md:col-span-5 flex flex-col justify-center">
+                <span class="text-sky-600 font-bold tracking-widest text-xs uppercase mb-2">מבוסס מחקר</span>
+                <h3 class="text-3xl md:text-4xl font-black text-slate-800 mb-6">למה זה עובד?</h3>
+                
+                <div class="space-y-8">
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                            פירמידת הלמידה (Learning Pyramid)
+                        </h4>
+                        <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                            פותחה ע"י מכון NTL (National Training Laboratories). המחקר מראה ששימור ידע בלמידה פסיבית (כשמסבירים לך) הוא נמוך מאוד (5-10%). לעומת זאת, בלמידה אקטיבית ("Learning by doing") הזיכרון מזנק ל-75%. כשאתם מנסחים את הבעיה לבד, אתם אקטיביים.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            אפקט הברווז (Rubber Duck Debugging)
+                        </h4>
+                        <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                            מושג ידוע בהנדסת תוכנה. עצם הפעולה של הסבר הבעיה (אפילו לברווז גומי, או לכתיבת הודעה מסודרת) מאלצת את המוח לארגן את המידע מחדש, ולעיתים קרובות הפתרון צץ עוד לפני שלחצתם "שלח".
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="md:col-span-7 bg-white rounded-3xl shadow-xl border border-slate-100 p-6 md:p-8">
+                <h5 class="text-center font-bold text-slate-500 mb-6">אחוזי שימור ידע ממוצעים לאחר שבועיים</h5>
+                <div class="chart-wrapper">
+                    <canvas id="retentionChart"></canvas>
+                </div>
+                <p class="text-center text-xs text-slate-400 mt-4">מקור הנתונים: NTL Institute for Applied Behavioral Science</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: The Tool -->
+    <section id="tool" class="py-24 px-4 bg-slate-50">
+        <div class="max-w-4xl mx-auto">
+            <div class="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+                <!-- Header Gradient -->
+                <div class="absolute top-0 w-full h-2 bg-gradient-to-r from-sky-400 via-indigo-500 to-sky-400"></div>
+
+                <div class="p-8 md:p-12">
+                    <div class="text-center mb-10">
+                        <h3 class="text-3xl font-black text-slate-800">מחולל השאלות</h3>
+                        <p class="text-slate-500 mt-2">מלאו את השדות והעתיקו את ההודעה המוכנה</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">1. הקשר (Context)</label>
+                                <textarea id="inp-context" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition" placeholder="למשל: נכנסתי למסך הגדרות ושיניתי סיסמה..."></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">2. ציפייה (Expectation)</label>
+                                <textarea id="inp-expectation" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition" placeholder="למשל: ציפיתי לקבל מייל אישור..."></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">3. מציאות (Reality)</label>
+                                <textarea id="inp-reality" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition" placeholder="למשל: קיבלתי שגיאה 403 והמסך קפא..."></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase text-emerald-600">4. השערה (Hypothesis) ⭐</label>
+                                <textarea id="inp-hypothesis" rows="3" class="w-full bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" placeholder="למשל: אולי הטוקן שלי פג תוקף?"></textarea>
+                            </div>
+                        </div>
+
+                        <button onclick="generateMessage()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-[0.99] transition flex justify-center items-center gap-2 group">
+                            <span>צור הודעה מקצועית</span>
+                            <span class="group-hover:rotate-12 transition-transform">✨</span>
+                        </button>
+                    </div>
+
+                    <!-- Output -->
+                    <div id="output-area" class="mt-8 hidden fade-in-up bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-xs font-bold text-emerald-600 uppercase">מוכן לשליחה</span>
+                            <button onclick="copyToClipboard(event)" class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition flex items-center gap-1.5 font-medium text-slate-600">
+                                <span>העתק</span>
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                            </button>
+                        </div>
+                        <textarea id="final-message" readonly class="w-full h-48 bg-transparent border-none resize-none focus:ring-0 text-sm font-mono text-slate-700 leading-relaxed"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-12">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col items-center">
+            <img src="https://futureflow.co.il/images//FutureFlow%20Logo.png" alt="FutureFlow" class="h-6 grayscale opacity-50 mb-4">
+            <p class="text-slate-400 text-sm text-center">
+                נבנה עבור צוותים שרוצים לרוץ מהר יותר.
+                <br>© 2024 FutureFlow Methodology.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // --- CHAT LOGIC ---
+        let activeScenarioId = 0;
+        const scenarios = {
+            bad: {
+                messages: [
+                    { sender: 'user', text: 'היי, המערכת לא עובדת לי.' },
+                    { sender: 'manager', text: 'מה לא עובד? איזה חלק?' },
+                    { sender: 'user', text: 'הייצוא של הדו"ח.' },
+                    { sender: 'manager', text: 'איזה דו"ח? ומה קורה כשאתה לוחץ?' },
+                    { sender: 'user', text: 'הדו"ח הכספי. זה פשוט לא עושה כלום.' },
+                    { sender: 'manager', text: 'יש שגיאה בקונסול? ניסית ריפרש?' },
+                    { sender: 'user', text: 'לא בדקתי קונסול. רגע בודק...' }
+                ],
+                time: '4 שעות (בזבוז זמן)',
+                color: 'text-red-500'
+            },
+            good: {
+                messages: [
+                    { sender: 'user', text: 'היי, נתקלתי בבעיה בייצוא דו"ח כספי (Context).\nציפיתי לקובץ CSV (Expectation).\nבפועל קיבלתי שגיאת 500 ב-Network (Reality).\nההשערה שלי: זה קורה רק בחודשים ללא נתונים (Hypothesis).\nאשמח להכוונה.' },
+                    { sender: 'manager', text: 'בול! הבאג באמת באירועים ריקים. תודה על הדיאגנוסטיקה המדויקת, אני מתקן.' }
+                ],
+                time: '5 דקות (פתרון מהיר)',
+                color: 'text-emerald-500'
+            }
+        };
+
+        async function playScenario(type) {
+            activeScenarioId++;
+            const currentRunId = activeScenarioId;
+
+            // UI Toggles
+            document.getElementById('btn-bad').className = type === 'bad' ? 'text-xs px-4 py-1.5 rounded-md transition font-bold bg-white shadow-sm text-red-500 ring-1 ring-slate-200' : 'text-xs px-4 py-1.5 rounded-md transition font-medium text-slate-500 hover:text-slate-700';
+            document.getElementById('btn-good').className = type === 'good' ? 'text-xs px-4 py-1.5 rounded-md transition font-bold bg-white shadow-sm text-emerald-600 ring-1 ring-slate-200' : 'text-xs px-4 py-1.5 rounded-md transition font-medium text-slate-500 hover:text-slate-700';
+
+            const container = document.getElementById('chat-container');
+            const timeDisplay = document.getElementById('time-estimate');
+            
+            container.innerHTML = '';
+            timeDisplay.innerHTML = '<span class="text-sm font-normal text-slate-400">מחשב...</span>';
+            
+            const messages = scenarios[type].messages;
+            
+            for (let i = 0; i < messages.length; i++) {
+                if (currentRunId !== activeScenarioId) return;
+
+                // Typing indicator
+                const typingDiv = document.createElement('div');
+                typingDiv.className = `chat-bubble ${messages[i].sender === 'user' ? 'chat-user' : 'chat-manager'} w-14 flex justify-center items-center gap-1 opacity-70`;
+                if(messages[i].sender === 'manager') typingDiv.style.alignSelf = 'flex-end'; // Force alignment
+                
+                typingDiv.innerHTML = '<div class="w-1.5 h-1.5 bg-current rounded-full typing-dot"></div><div class="w-1.5 h-1.5 bg-current rounded-full typing-dot"></div><div class="w-1.5 h-1.5 bg-current rounded-full typing-dot"></div>';
+                container.appendChild(typingDiv);
+                container.scrollTop = container.scrollHeight;
+                
+                await new Promise(r => setTimeout(r, type === 'good' ? 800 : 600));
+                
+                if (currentRunId !== activeScenarioId) return;
+                if (typingDiv.parentNode) container.removeChild(typingDiv);
+                
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `chat-bubble ${messages[i].sender === 'user' ? 'chat-user' : 'chat-manager'} fade-in-up whitespace-pre-wrap shadow-sm`;
+                msgDiv.innerText = messages[i].text;
+                container.appendChild(msgDiv);
+                container.scrollTop = container.scrollHeight;
+                
+                await new Promise(r => setTimeout(r, 500));
+            }
+            
+            if (currentRunId !== activeScenarioId) return;
+
+            timeDisplay.className = `font-black text-2xl ${scenarios[type].color}`;
+            timeDisplay.innerText = scenarios[type].time;
+        }
+
+        // --- GENERATOR LOGIC ---
+        function generateMessage() {
+            const context = document.getElementById('inp-context').value;
+            const expectation = document.getElementById('inp-expectation').value;
+            const reality = document.getElementById('inp-reality').value;
+            const hypothesis = document.getElementById('inp-hypothesis').value;
+
+            if(!context && !expectation && !reality) {
+                alert('אנא מלא/י לפחות חלק מהשדות כדי ליצור הודעה.');
+                return;
+            }
+
+            const template = `היי, אשמח לעזרה בנושא הבא:
+
+🔭 מה עשיתי (Context):
+${context || '-'}
+
+🎯 מה ציפיתי שיקרה (Expectation):
+${expectation || '-'}
+
+🔥 מה קרה בפועל / שגיאות (Reality):
+${reality || '-'}
+
+💡 ההשערה שלי / כיוון בדיקה (Hypothesis):
+${hypothesis || '-'}`;
+
+            document.getElementById('final-message').value = template;
+            const output = document.getElementById('output-area');
+            output.classList.remove('hidden');
+            // Reset animation
+            output.classList.remove('fade-in-up');
+            void output.offsetWidth; 
+            output.classList.add('fade-in-up');
+            
+            output.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function copyToClipboard(event) {
+            const copyText = document.getElementById("final-message");
+            copyText.select();
+            
+            try {
+                document.execCommand('copy');
+                const btn = event.currentTarget;
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<span class="text-emerald-600">הועתק!</span>';
+                setTimeout(() => btn.innerHTML = originalHtml, 2000);
+            } catch (err) {
+                console.error('Fallback copy failed', err);
+            }
+        }
+
+        // --- CHART LOGIC ---
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('retentionChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['הרצאה (5%)', 'קריאה (10%)', 'הדגמה (30%)', 'דיון (50%)', 'התנסות מעשית (75%)', 'לימוד אחרים (90%)'],
+                    datasets: [{
+                        label: 'אחוז שימור ידע',
+                        data: [5, 10, 30, 50, 75, 90],
+                        backgroundColor: [
+                            '#e2e8f0', // slate-200
+                            '#cbd5e1', 
+                            '#94a3b8', 
+                            '#64748b', 
+                            '#0ea5e9', // Sky-500 (Highlight)
+                            '#0284c7'  // Sky-600 (Highlight)
+                        ],
+                        borderRadius: 6,
+                        barThickness: 25
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false, // Critical for responsiveness
+                    layout: {
+                        padding: {
+                            bottom: 20, // Prevents bottom text clipping
+                            left: 10,
+                            right: 20
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 12,
+                            titleFont: { family: 'Heebo' },
+                            bodyFont: { family: 'Heebo' },
+                            rtl: true
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            max: 100,
+                            ticks: { 
+                                callback: function(value) { return value + "%" },
+                                font: { family: 'Heebo' }
+                            }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 13, family: 'Heebo', weight: '500' }, 
+                                color: '#475569',
+                                autoSkip: false, // Ensure all labels show
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Start simulation
+            setTimeout(() => playScenario('bad'), 1500);
+        });
+    </script>
+</body>
+</html>
